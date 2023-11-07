@@ -1,11 +1,13 @@
 package com.tree;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.TreeMap;
 
 public class TopDownDFSProblems {
     /**
-     * 10 problems
+     * 15 problems
      * General DFS templates
      * Print all paths of a tree
      * Path Sum (LC#112)
@@ -16,6 +18,10 @@ public class TopDownDFSProblems {
      * Invert Binary Tree
      * Maximum Depth of N-ary tree (LC#559)
      * Height of K-ary Tree. Both Top-down and Bottom-Up
+     * Vertical Order Traversal Of A Binary Tree (LC# 314,987)
+     * Binary Tree Upside Down (LC#156)
+     * Merge two Binary trees
+     * Sum of root to leaf binary numbers (LC# 129, 1022)
      **/
 
     static ArrayList<Integer> preorderTraversal(TreeNode root) {
@@ -403,7 +409,6 @@ public class TopDownDFSProblems {
         maxDepthOfNAryTreeHelper(root, 0, globalHeight);
         return globalHeight[0];
     }
-
     static void maxDepthOfNAryTreeHelper(Node node, int nodesUptoParent, int[] globalHeight) {
         // Common for leaf and non-leaf nodes
         int nodesUptoMe = 1 + nodesUptoParent;
@@ -435,7 +440,6 @@ public class TopDownDFSProblems {
         heightOfKAryTreeHelper(root, -1, globalHeight); // -1 because the root should be at depth 0
         return globalHeight[0];
     }
-
     static void heightOfKAryTreeHelper(Node node, int nodesUptoParent, int[] globalHeight) {
         // Common for leaf and non-leaf nodes
         int nodesUptoMe = 1 + nodesUptoParent;
@@ -463,7 +467,6 @@ public class TopDownDFSProblems {
 
         return heightOfKAryTreeBUHelper(root);
     }
-
     private int heightOfKAryTreeBUHelper(Node node) {
         // Base case: Leaf node
         if (node.children.isEmpty()) {
@@ -480,6 +483,158 @@ public class TopDownDFSProblems {
         return nodeHeight;
     }
 
+    static List<List<Integer>> verticalOrderTraversal(TreeNode root) {
+        if (root == null) {
+            return new ArrayList<>();
+        }
+
+        TreeMap<Integer, TreeMap<Integer, List<Integer>>> result = new TreeMap<>();
+        verticalOrderTraversalHelper(root, 0, 0, result);
+
+        List<List<Integer>> output = new ArrayList<>();
+        for (int x : result.keySet()) {
+            List<Integer> temp = new ArrayList<>();
+            for (int y : result.get(x).keySet()) {
+                List<Integer> vals = result.get(x).get(y);
+                Collections.sort(vals);// two variants of this problem differ by this line
+                temp.addAll(vals);
+            }
+            output.add(temp);
+        }
+
+        return output;
+    }
+    static void verticalOrderTraversalHelper(TreeNode node, int x, int y,
+                                             TreeMap<Integer, TreeMap<Integer, List<Integer>>> result) {
+        result.putIfAbsent(x, new TreeMap<>());
+
+        if (!result.get(x).containsKey(y)) {
+            result.get(x).put(y, new ArrayList<>());
+        }
+
+        result.get(x).get(y).add(node.val);
+
+        if (node.left != null) {
+            verticalOrderTraversalHelper(node.left, x - 1, y + 1, result);
+        }
+        if (node.right != null) {
+            verticalOrderTraversalHelper(node.right, x + 1, y + 1, result);
+        }
+    }
+
+    public TreeNode upsideDownBinaryTree(TreeNode root) {
+        if (root == null) {
+            return null;
+        }
+        TreeNode[] globalRoot = {null};
+        upsideDownBinaryTreeHelper(root, null, null, globalRoot);
+        return globalRoot[0];
+    }
+    private void upsideDownBinaryTreeHelper(TreeNode node, TreeNode parent, TreeNode rightSibling, TreeNode[] globalRoot) {
+        TreeNode oldLeft = node.left;
+        TreeNode oldRight = node.right;
+        node.right = parent;
+        node.left = rightSibling;
+
+        // Base case: Leaf node
+        if (oldLeft == null && oldRight == null) {
+            globalRoot[0] = node;
+        }
+
+        // Recursive case: Internal node
+        if (oldLeft != null) {
+            upsideDownBinaryTreeHelper(oldLeft, node, oldRight, globalRoot);
+        }
+    }
+
+    static TreeNode mergeTwoBinaryTrees(TreeNode t1, TreeNode t2) {
+        if (t1 == null) {
+            return t2;
+        }
+        if (t2 == null) {
+            return t1;
+        }
+
+        // Top-down DFS merge
+        mergeTwoBinaryTreesHelper(t1, t2);
+
+        return t1;
+    }
+    static void mergeTwoBinaryTreesHelper(TreeNode node1, TreeNode node2) {
+        // Both nodes must be non-null
+
+        // First node is the base, second node will merge into it
+        node1.val += node2.val;
+
+        if (node1.left != null) {
+            if (node2.left != null) {
+                mergeTwoBinaryTreesHelper(node1.left, node2.left);
+            }
+            // Nothing to do if the second node is null
+
+        } else {
+            // If the first node is null, then connect the second node into the base tree
+            node1.left = node2.left;
+        }
+
+        // Similar to left child merge
+        if (node1.right != null) {
+            if (node2.right != null) {
+                mergeTwoBinaryTreesHelper(node1.right, node2.right);
+            }
+            // Nothing to do if the second node is null
+
+        } else {
+            // If the first node is null, set its right child to the right child of the second node
+            node1.right = node2.right;
+        }
+    }
+
+    static Integer sumRootToLeafNumbers(TreeNode root) { // LC 1022
+        if (root == null) {
+            return 0;
+        }
+        int[] globalSum = {0};
+        sumRootToLeafNumbersHelper(root, 0, globalSum);
+        return globalSum[0];
+    }
+    static void sumRootToLeafNumbersHelper(TreeNode node, int current, int[] globalSum) {
+        int localSum = current << 1;
+        if (node.val == 1) {
+            localSum++;
+        }
+        if (node.left == null && node.right == null) {
+            globalSum[0] += localSum;
+        }
+        if (node.left != null) {
+            sumRootToLeafNumbersHelper(node.left, localSum, globalSum);
+        }
+        if (node.right != null) {
+            sumRootToLeafNumbersHelper(node.right, localSum, globalSum);
+        }
+    }
+
+    static Integer sumRootToLeafNumbersV2(TreeNode root) { // LC 129
+        if (root == null) {
+            return 0;
+        }
+        int[] globalSum = {0};
+        sumRootToLeafNumbersV2Helper(root, 0, globalSum);
+        return globalSum[0];
+    }
+    static void sumRootToLeafNumbersV2Helper(TreeNode node, int num, int[] globalSum) {
+        num = num * 10 + node.val;
+        if (node.left == null && node.right == null) {
+            globalSum[0] += num;
+        }
+        if (node.left != null) {
+            sumRootToLeafNumbersV2Helper(node.left, num, globalSum);
+        }
+        if (node.right != null) {
+            sumRootToLeafNumbersV2Helper(node.right, num, globalSum);
+        }
+    }
+
 
     static class TreeNode {
         int val;
@@ -494,22 +649,6 @@ public class TopDownDFSProblems {
             this.val = val;
         }
 
-    }
-
-    static class Pair {
-        TreeNode node;
-        TreeNode node2;
-        int index;
-
-        public Pair(TreeNode node, int index) {
-            this.node = node;
-            this.index = index;
-        }
-
-        public Pair(TreeNode node1, TreeNode node2) {
-            this.node = node1;
-            this.node2 = node2;
-        }
     }
 
     class Node {
@@ -529,14 +668,15 @@ public class TopDownDFSProblems {
         }
     }
 
-
     public static void main(String[] args) {
 
         TreeNode root2 = new TreeNode(1);
         root2.left = new TreeNode(2);
         root2.right = new TreeNode(3);
-        root2.right.left = new TreeNode(4);
-        root2.right.left.left = new TreeNode(5);
+        root2.right.left = new TreeNode(6);
+        root2.right.right = new TreeNode(7);
+        root2.left.left = new TreeNode(4);
+        root2.left.right = new TreeNode(5);
 
         int longestPath = longestConsecutiveSequenceV2(root2);
         System.out.println("Longest Consecutive Path Length: " + longestPath);
@@ -559,7 +699,8 @@ public class TopDownDFSProblems {
         root5.right = new TreeNode(7);
         root5.right.left = new TreeNode(6);
         root5.right.right = new TreeNode(9);
-        System.out.println(invertBinaryTree(root5));
+        //System.out.println(invertBinaryTree(root5));
+
 
     }
 }

@@ -8,8 +8,8 @@ import java.util.Queue;
 import java.util.Stack;
 
 public class BFSProblems {
-    /**
-     *  20 problems
+
+    /** 22 problems
      * Binary Tree Level Order Traversal (LC#102)
      * Binary Tree Level Order Traversal Bottom (LC#107)
      * N-ary Tree Level Order Traversal (LC#429)
@@ -30,6 +30,8 @@ public class BFSProblems {
      * Same Tree (LC#100)
      * Symmetric Tree (LC#101)
      * Clone a Binary Tree
+     * Find bottom left tree value (LC#513). Can also be done using top-down DFS
+     * Bottom view of a tree
      */
 
     /**
@@ -562,6 +564,7 @@ public class BFSProblems {
         return root;
     }
 
+    // the input tree is a complete binary tree
     static int widthOfBinaryTree(TreeNode root) {
         if (root == null) {
             return 0;
@@ -836,6 +839,57 @@ public class BFSProblems {
         }
 
         return result;
+    }
+
+    static Integer findBottomLeftValue(TreeNode root) {
+        Integer bottomLeftValue = null;
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+
+        while (!queue.isEmpty()) {
+            int currentLevelNodeCount = queue.size(); // find out how many nodes are in the current level
+            Integer firstValue = null;
+            // Processing the nodes from the current level.
+            for (int i = 0; i < currentLevelNodeCount; i++) {
+                TreeNode current = queue.poll();
+                if (firstValue == null) {
+                    firstValue = current.val;
+                }
+
+                if (current.left != null) {
+                    queue.offer(current.left);
+                }
+                if (current.right != null) {
+                    queue.offer(current.right);
+                }
+            }
+            bottomLeftValue = firstValue;
+        }
+        return bottomLeftValue;
+    }
+
+    static int findBottomLeftValueTD(TreeNode root) {
+        List<Integer> leftMost = new ArrayList<>();
+        findBottomLeftValueTDHelper(root, 0, leftMost);
+        return leftMost.remove(leftMost.size() - 1);
+    }
+
+    static void findBottomLeftValueTDHelper(TreeNode node, int parentDepth, List<Integer> leftMost) {
+        int myDepth = parentDepth + 1;
+        if (myDepth > leftMost.size()) {
+            leftMost.add(node.val);
+        }
+        // Base Case: Leaf Node
+        if (node.left == null && node.right == null) {
+            // Do nothing
+        }
+        // Recursive case: Internal Node
+        if (node.left != null) {
+            findBottomLeftValueTDHelper(node.left, myDepth, leftMost);
+        }
+        if (node.right != null) {
+            findBottomLeftValueTDHelper(node.right, myDepth, leftMost);
+        }
     }
 
 
