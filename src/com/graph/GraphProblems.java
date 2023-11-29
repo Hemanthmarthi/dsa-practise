@@ -2,6 +2,7 @@ package com.graph;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -695,7 +696,7 @@ public class GraphProblems {
 
         GraphNode(Integer value) {
             this.value = value;
-            this.neighbors = new ArrayList<>(3);
+            this.neighbors = new ArrayList(3);
         }
     }
     /*static class GraphNode {
@@ -823,6 +824,42 @@ public class GraphProblems {
         return image;
     }
 
+    /*
+    Asymptotic complexity in terms of total number of pixels in `image`(i.e. width * height) `n`:
+    * Time: O(n).
+    * Auxiliary space: O(n).
+    * Total space: O(n).
+    */
+
+    // Direction arrays dx[] and dy[] denote the neighbours of current cell along four directions.
+    static int dx[] = {-1, 1, 0, 0};
+    static int dy[] = {0, 0, -1, 1};
+
+    static ArrayList<ArrayList<Integer>> flood_fill(Integer pixel_row, Integer pixel_column, Integer new_color, ArrayList<ArrayList<Integer>> image) {
+        if (image.get(pixel_row).get(pixel_column).equals(new_color)) {
+            return image;
+        }
+
+        Integer old_color = image.get(pixel_row).get(pixel_column);
+        recursive_dfs(image, pixel_row, pixel_column, old_color, new_color);
+        return image;
+    }
+
+    static void recursive_dfs(ArrayList<ArrayList<Integer>> image, int row, Integer column, Integer old_color, Integer new_color) {
+        image.get(row).set(column, new_color);
+        // Being at any position (i, j), we have to check whether we can move to the following positions:
+        // (i + 1, j), (i - 1, j), (i, j + 1), (i, j - 1). We will use the direction arrays dx[] and dy[].
+        for (int i = 0; i < 4; i++) {
+            int r = row + dx[i];
+            int c = column + dy[i];
+            if (r >= 0 && r < image.size() &&
+                    c >= 0 && c < image.get(0).size() &&
+                    image.get(r).get(c).equals(old_color)) {
+                recursive_dfs(image, r, c, old_color, new_color);
+            }
+        }
+    }
+
 
     static class Tuple{
         int row;
@@ -922,6 +959,75 @@ public class GraphProblems {
         itinerary.addFirst(airport);
     }
 
+
+    /*
+     * Asymptotic complexity in terms of the number of courses `n` and the number of prerequisites `e`:
+     * Time: O(n + e).
+     * Auxiliary space: O(n + e).
+     * Total space: O(n + e).
+     */
+
+    // This will store a list of outgoing adj_list for every graph node.
+    static ArrayList<ArrayList<Integer>> adj_list;
+
+    // A graph node may be in one of three states during a DFS run:
+    static int NEVER_VISITED = 0, VISITED = 1, FINISHED = 2;
+
+    // This will store those states for all nodes.
+    static ArrayList<Integer> visited2;
+
+    // This will store the ordering of nodes to be returned.
+    static ArrayList<Integer> answer;
+
+    // Runs DFS from the given node.
+    // Adds it to the `answer` list after exploring all neighbors.
+    // Returns false if a cycle is detected, true otherwise.
+    static boolean dfs(int node) {
+        visited2.set(node, VISITED);
+
+        for (int neighbor : adj_list.get(node)) {
+            if (visited2.get(neighbor) == VISITED)
+                return false; // Cycle detected.
+
+            if (visited2.get(neighbor) == NEVER_VISITED) {
+                if (!dfs(neighbor))
+                    return false; // Cycle detected while exploring neighbor's neighbors.
+            }
+        }
+
+        visited2.set(node, FINISHED);
+        answer.add(node);
+
+        return true; // node and its neighbors do not form a cycle.
+    }
+
+    static ArrayList<Integer> course_schedule(int n, ArrayList<ArrayList<Integer>> prerequisites) {
+        answer = new ArrayList<>();
+
+        // Initialize the graph.
+        adj_list = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            adj_list.add(new ArrayList<>());
+        }
+
+        visited2 = new ArrayList<>(Collections.nCopies(n, 0));
+
+        for (ArrayList<Integer> p : prerequisites) {
+            adj_list.get(p.get(1)).add(p.get(0));
+        }
+
+        // Top level DFS: call DFS on each unvisited node in the graph.
+        for (int i = 0; i < n; i++) {
+            if (visited2.get(i) == NEVER_VISITED) {
+                if (!dfs(i)) {
+                    return new ArrayList<Integer>(Arrays.asList(-1));
+                }
+            }
+        }
+
+        Collections.reverse(answer);
+        return answer;
+    }
 
 
 
