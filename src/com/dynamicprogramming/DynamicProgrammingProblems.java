@@ -170,5 +170,43 @@ public class DynamicProgrammingProblems {
         return dp[n][m];
     }
 
+    static Long jump_ways(Integer n) {
+
+        if(n==0){
+            return 0L;
+        }
+        if(n==1){
+            return 1L;
+        }
+        if(n==2){
+            return 2L;
+        }
+
+        //try DP
+        //indices go from 0 to n
+        //tab[n] = number of ways to jump a length n
+        Long[] tab = new Long[n+1];
+        tab[0]=0L;
+        tab[1]=1L;
+        tab[2]=2L;
+
+        for(int i=3; i<=n; i++){
+            tab[i]=tab[i-1]+tab[i-2];
+        }
+
+        return tab[n];
+    }
+
+    static Integer find_fibonacci(Integer n) {
+        int[] memo = new int[3];
+        memo[0] = 0;
+        memo[1] = 1;
+        for(int i = 2; i <= n.intValue(); i++){
+            int index = i%3;
+            int value = memo[(i-1)%3] + memo[(i-2)%3];
+            memo[index] = value;
+        }
+        return memo[n.intValue()%3];
+    }
 
 }
