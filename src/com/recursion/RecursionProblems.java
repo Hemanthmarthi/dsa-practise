@@ -362,6 +362,30 @@ public class RecursionProblems {
         return;
     }
 
+    
+    public static List<String> letterCombinations(String digits) {
+        String [] arr = {"", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"};
+        List<String> output = new ArrayList<>();
+        if(digits == null || digits.length() == 0){
+            return output;
+        }
+
+        letterCombinationsHelper(digits, output, "", 0, arr);
+        return output;
+    }
+
+    static void letterCombinationsHelper(String digits, List<String> output, String current, int index, String[] arr){
+        if (index == digits.length()){
+            output.add(current);
+            return;
+        }
+
+        String letters = arr[digits.charAt(index) - '0'];
+        for(int i = 0; i< letters.length(); i++){
+            letterCombinationsHelper(digits, output, current + letters.charAt(i), index + 1, arr);
+        }
+    }
+    
     public static void main(String[] args) {
         ArrayList<Integer> integers = new ArrayList<>();
         integers.add(1);
@@ -370,5 +394,8 @@ public class RecursionProblems {
         System.out.println(permuteArrayOfUniqueIntegers(integers));
         //System.out.println(letterCasePermutation("a1b2"));
         System.out.println(getDistinctSubsets("aabc"));
+         String digits = "23";
+        List<String> output = letterCombinations(digits);
+        System.out.println(output);
     }
 }
