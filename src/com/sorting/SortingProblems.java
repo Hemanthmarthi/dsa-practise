@@ -377,6 +377,9 @@ public class SortingProblems {
     static Integer kthLargestInAnArray(ArrayList<Integer> numbers, Integer k) {
         // Use QuickSelector which runs in O(n) to find the Kth largest number
         return quickSelect(numbers, 0, numbers.size() - 1, numbers.size() - k);
+        // kth smallest
+        // quickSelect(numbers, 0, numbers.size() - 1, k-1)
+        // K smallest numbers are values making upto pivot
     }
 
     private static int quickSelect(ArrayList<Integer> nums, int start, int end, int index) {

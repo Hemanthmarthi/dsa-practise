@@ -1,6 +1,5 @@
 package com.strings;
 
-import javax.xml.stream.events.Characters;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -10,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+// 20 practise problems
 public class StringProblems {
 
     // Check whether a String is palindrome or not

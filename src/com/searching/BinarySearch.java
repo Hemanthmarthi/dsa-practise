@@ -90,7 +90,7 @@ public class BinarySearch {
         int end = letters.length - 1;
         while (start <= end) {
             int mid = start + (end - start) / 2;
-            if (letters[mid] < target) {
+            if (letters[mid] <= target) {
                 start = mid + 1;
             } else { // letters[mid] > target
                 end = mid - 1;
@@ -762,11 +762,11 @@ public class BinarySearch {
             int hours = 0;
             for (int pile : piles) {
                 hours += Math.ceil(pile * 1.0 / midK);
-                if (hours > H) {
-                    startK = midK + 1;
-                } else {
-                    endK = midK - 1;
-                }
+            }
+            if (hours > H) {
+                startK = midK + 1;
+            } else {
+                endK = midK - 1;
             }
         }
         return startK; // returns minimum integer that koko can eat all bananas with in H hours

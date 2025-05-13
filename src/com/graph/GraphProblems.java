@@ -380,6 +380,7 @@ public class GraphProblems {
         }
         return true;// The given graph is connected and does not have any cycle. Hence, it is a tree.
     }
+
     static boolean isGraphATreeBfs(int vertex) {
         Queue<Integer> q = new LinkedList<>();
         q.add(vertex);
@@ -388,7 +389,7 @@ public class GraphProblems {
             int n = q.remove();
             for (int j = 0; j < adjList.get(n).size(); j++) {
                 int neighbor = adjList.get(n).get(j);
-                if (visitedVertices[neighbor] == -1) {
+                if (visitedVertices[neighbor] == -1) { // tree edge
                     nodeParent[neighbor] = n;
                     visitedVertices[neighbor] = 1;
                     q.add(neighbor);
@@ -1027,6 +1028,70 @@ public class GraphProblems {
 
         Collections.reverse(answer);
         return answer;
+    }
+
+    /*
+    Asymptotic complexity in terms of the number of rows and number of columns `n` and `m` respectively:
+    * Time: O(n * m).
+    * Auxiliary space: O(n * m).
+    * Total space: O(n * m).
+    */
+    static int rotting_oranges(ArrayList<ArrayList<Integer>> grid) {
+        // We will use these direction arrays to move from any cell at (i, j) to its
+        // adjacent cells (i + 1, j), (i - 1, j), (i, j + 1) and (i, j - 1).
+        int[] dx = {+1, -1, +0, +0};
+        int[] dy = {+0, +0, +1, -1};
+
+        int n = grid.size();
+        int m = grid.get(0).size();
+
+        Queue<int[]> q = new LinkedList<>();
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (grid.get(i).get(j) == 2) {
+                    q.add(new int[]{i, j});
+                }
+            }
+        }
+
+        int result = 0; // This will represent the number of times we have iterated in the while-loop below.
+        int r, c;
+        while (!q.isEmpty()) {
+            // "size" is the number of rotten oranges that could rot the adjacent fresh oranges
+            // in the current iteration.
+            int size = q.size();
+            result++;
+
+            for (int j = 0; j < size; j++) {
+                int[] cur = q.poll();
+                r = cur[0];
+                c = cur[1];
+
+                for (int i = 0; i < 4; i++) {
+                    if (r + dx[i] >= 0 && r + dx[i] < n &&
+                            c + dy[i] >= 0 && c + dy[i] < m &&
+                            grid.get(r + dx[i]).get(c + dy[i]) == 1) {
+
+                        grid.get(r + dx[i]).set(c + dy[i], 2);
+                        q.add(new int[]{r + dx[i], c + dy[i]});
+                    }
+                }
+            }
+        }
+
+        // If we are still left with any fresh orange, it means that rotting of all of the oranges
+        // is not possible. So we will return -1 in this case.
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < m; j++) {
+                if (grid.get(i).get(j) == 1) {
+                    return -1;
+                }
+            }
+        }
+        // If the result is 0, it means that there were not fresh oranges in the grid initially.
+        return Math.max(0, result - 1);
     }
 
 

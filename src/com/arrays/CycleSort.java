@@ -74,19 +74,14 @@ public class CycleSort {
         return -1;
     }
 
-    static int[] findErrorNums(int[] nums) {
-        for (int i = 0; i < nums.length; i++) {
-            while (nums[i] != i + 1) {
-                int idx = nums[i] - 1;
-                if (idx >= 0 && idx < nums.length) { // Check for valid index
-                    if (nums[idx] != nums[i]) {
-                        swap(nums, nums[idx], nums[i]);
-                    } else {
-                        // If duplicate found, break loop and return result
-                        return new int[]{nums[i], i + 1};
-                    }
+    static int[] setMismatch(int[] nums){
+        for (int i = 0; i < nums.length; i++){
+            while (nums[i] != i+1) {
+              int idx = nums[i] - 1;
+                if (nums[idx] != nums[i]) {
+                    swap(nums, nums[i], nums[idx]);
                 } else {
-                    break; // Exit loop if index is not within bounds
+                    break;
                 }
             }
         }
@@ -94,6 +89,7 @@ public class CycleSort {
             if (nums[i] != i + 1) {
                 return new int[]{nums[i], i + 1};
             }
+
         }
         return new int[]{-1, -1};
     }
@@ -118,6 +114,30 @@ public class CycleSort {
             }
         }
         return result;
+    }
+
+    static int[] findErrorNums(int[] nums) {
+        for (int i = 0; i < nums.length; i++) {
+            while (nums[i] != i + 1) {
+                int idx = nums[i] - 1;
+                if (idx >= 0 && idx < nums.length) { // Check for valid index
+                    if (nums[idx] != nums[i]) {
+                        swap(nums, nums[idx], nums[i]);
+                    } else {
+                        // If duplicate found, break loop and return result
+                        return new int[]{nums[i], i + 1};
+                    }
+                } else {
+                    break; // Exit loop if index is not within bounds
+                }
+            }
+        }
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] != i + 1) {
+                return new int[]{nums[i], i + 1};
+            }
+        }
+        return new int[]{-1, -1};
     }
 
     static int findFirstMissingPositive(int[] nums) {
